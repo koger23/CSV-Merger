@@ -22,11 +22,21 @@ class TargetWidget(QWidget):
         mainLayout.addWidget(btnBrowse)
         btnBrowse.clicked.connect(self.browseTarget)
 
+        self.txtTarget.textChanged.connect(self.autoChangeSize)
+
     def browseTarget(self):
 
         filePath = QFileDialog.getSaveFileName(filter=("Comma separated text files (*.csv)"))
 
         self.txtTarget.setText(filePath[0])
+
+    def autoChangeSize(self):
+
+        textHeight = self.txtTarget.document().size().height()
+        textLength = len(self.txtTarget.toPlainText())
+
+        if self.txtTarget.height() < textHeight:
+            self.setMinimumWidth(self.width() + textLength)
 
 
 if __name__ == '__main__':

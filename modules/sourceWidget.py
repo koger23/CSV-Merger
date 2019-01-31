@@ -21,12 +21,20 @@ class SourceWidget(QWidget):
         mainLayout.addWidget(btnBrowse)
         btnBrowse.clicked.connect(self.browseSource)
 
+        self.txtSource.textChanged.connect(self.autoChangeSize)
+
     def browseSource(self):
 
         filePath = QFileDialog.getExistingDirectory()
         self.txtSource.setText(filePath)
 
+    def autoChangeSize(self):
 
+        textHeight = self.txtSource.document().size().height()
+        textLength = len(self.txtSource.toPlainText())
+
+        if self.txtSource.height() < textHeight:
+            self.setMinimumWidth(self.width() + textLength)
 
 
 if __name__ == '__main__':

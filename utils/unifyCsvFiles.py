@@ -2,7 +2,19 @@
 import os
 
 
-def unifyCsvFiles(csvFileList, filename, targetpath=None, header=True, encoding=None):
+def unifyCsvFiles(csvFileList, filename, targetpath=None, header=True, encoding=None, progBar=None):
+
+    """
+    Unifying text files based on given file list and save it in given path with given filename.
+
+    :param csvFileList: list
+    :param filename: string - target filename for saving
+    :param targetpath: string - target file path for saving the file
+    :param header: boolean - for keeping header of csv files
+    :param encoding: string - encoding of text files
+    :param progBar: QProgressbar object
+    :return: nothing
+    """
 
     if encoding:
         encode = encoding
@@ -23,9 +35,19 @@ def unifyCsvFiles(csvFileList, filename, targetpath=None, header=True, encoding=
 
     if numOfFiles > 0:
 
+        if progBar:
+            progBar.setMaximum(numOfFiles)
+
         No = 1 # counter for files for progressbar
 
-        target_file = open(targetFullPath, "w", encoding=encode)
+        try:
+            target_file = open(targetFullPath, "w", encoding=encode)
+        except PermissionError as e:
+                    errorMsg = "Permission denied:\n\n" + \
+                               str(e) + \
+                               "\n\nProbably you do not have the permission to create a file in the target folder."
+                    return errorMsg
+
 
         for file in csvFileList:
 
@@ -38,9 +60,19 @@ def unifyCsvFiles(csvFileList, filename, targetpath=None, header=True, encoding=
                     countH += 1
             # write starts with second line only
             else:
-                lines = f.readlines()[1:]
+                try:
+                    lines = f.readlines()[1:]
+                except UnicodeDecodeError as e:
+                    errorMsg = "Decoding error:\n\n" + \
+                               str(e) + \
+                               "\n\nProbably the selected encoding is not proper."
+                    return errorMsg
+
                 for rows in lines:
                     target_file.write(rows)
+
+            if progBar:
+                progBar.increaseValue(No)
 
             No += 1
 
